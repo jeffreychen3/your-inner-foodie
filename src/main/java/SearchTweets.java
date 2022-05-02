@@ -29,23 +29,9 @@ public class SearchTweets {
     }
 
     /**
-     *      Searches for tweets in the area we are considering in terms of longitude and latitude, and contains at least
-     *      one of the restaurant names
-     *
-     *      Query length is limited to 512 CHARACTERS
-     * */
-    private Twitter getTwitterInstance() {
-        ConfigurationBuilder cb = new ConfigurationBuilder();
-        cb.setDebugEnabled(true)
-                .setOAuthConsumerKey("aFJOAYb6xmGEfEv7kyspsTK8u")
-                .setOAuthConsumerSecret("zw8QB4WyEqMZ0Wp5PWtc4xPRyPi1P0hHgV42LHan3eDTgYD2Qs")
-                .setOAuthAccessToken("1322109139934306304-HdtnexWKKmQtJogYHgalVp2afbrVum")
-                .setOAuthAccessTokenSecret("qMml5G2n3T9wbn7dCddpdDIUDZuloxquFNuzaNg2CEFd7");
-        Twitter twitter = new TwitterFactory(cb.build()).getInstance();
-
-        return twitter;
-    }
-
+     * Creates a Twitter API instance that is authorised to access data using Ethan's keys
+     * @return An authorized Twitter API instance
+     */
     private TwitterApi getTwitterAPI() {
         TwitterCredentialsOAuth1 credentialsOAuth1 = new TwitterCredentialsOAuth1("aFJOAYb6xmGEfEv7kyspsTK8u",
                 "zw8QB4WyEqMZ0Wp5PWtc4xPRyPi1P0hHgV42LHan3eDTgYD2Qs", "1322109139934306304-N5pglGAs4uePDqIlAT9nl4olwwDIXD",
@@ -57,6 +43,12 @@ public class SearchTweets {
         return apiInstance;
     }
 
+    /**
+     * Searches for tweets that contains a restaurant's name and the name of the city, or the author is from the city
+     * @param cityName Name of city
+     * @param restaurantNames An array of all restaurants we want to look for
+     * @return arraylist of all valid tweets (described as above)
+     */
     public ArrayList<String> GetSearchedTweets(String cityName, String[] restaurantNames) {
         ArrayList<String> tweetedContent = new ArrayList<>();
 
@@ -110,7 +102,12 @@ public class SearchTweets {
         return tweetedContent;
     }
 
-
+    /**
+     * Associates the tweets given to a particular restaurant
+     * @param tweetedContent the text of the tweet
+     * @param restaurantNames the array of restaurant names
+     * @return a map of restaurants (key) to their respective tweets (value)
+     */
     public Map<String, ArrayList<String>> popularTweets(ArrayList<String> tweetedContent, String[] restaurantNames) {
         Map<String, ArrayList<String>> popularTweets = new HashMap<>();
 
