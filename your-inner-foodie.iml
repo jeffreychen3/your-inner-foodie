@@ -17,5 +17,7 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="porter-stemmer-1.4" level="project" />
+    <orderEntry type="library" name="opennlp-tools-1.5.3" level="project" />
   </component>
 </module>
