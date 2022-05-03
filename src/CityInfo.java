@@ -158,7 +158,7 @@ public class CityInfo {
 		} 
 		
 		try {
-			//
+			//Need to wait 2s in between api call or else it would return invalid request.
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
