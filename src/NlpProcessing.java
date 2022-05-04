@@ -79,6 +79,10 @@ public class NlpProcessing {
     public void evaluateTweets() {
         for (String restaurant: restaurants.keySet() ) {
             List<String> tweets = restaurants.get(restaurant);
+            if (tweets.size() == 0) {
+                scores.put(restaurant, 0.0);
+                continue;
+            }
             double sum = 0;
             for (String tweet: tweets) {
                 double score = evaluate(tweet);
