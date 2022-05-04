@@ -27,6 +27,7 @@ public class SearchTweets {
         String[] names = {"Momofuku", "capital grille", "keens"};
         System.out.println(t.GetSearchedTweets(city, names));
     }
+    
 
     /**
      * Creates a Twitter API instance that is authorised to access data using Ethan's keys
