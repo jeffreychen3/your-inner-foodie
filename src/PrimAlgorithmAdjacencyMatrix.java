@@ -112,12 +112,12 @@ public class PrimAlgorithmAdjacencyMatrix {
 			Double total_min_weight = 0.0;
 			System.out.println("Fastest way to visit top restaurant: ");
 			for (int i = 1; i <vertices ; i++) {
-				System.out.print(restaurants.get(i) + "- (" + resultSet[i].weight + ") - ");
+				System.out.print(restaurants.get(i) + " - (" + resultSet[i].weight + " miles) - ");
 				total_min_weight += resultSet[i].weight;
 			}
 			
 			System.out.println(restaurants.get(resultSet[vertices - 1].parent));
-			System.out.printf("Total distance to visit all top restaurants is : %.3f\n", total_min_weight);
+			System.out.printf("Total distance to visit all top restaurants is : %.3f miles\n", total_min_weight);
 			
 		}
 	}
