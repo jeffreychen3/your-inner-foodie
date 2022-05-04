@@ -4,18 +4,25 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
 
-public class NlpProcessing {
 
+/*
+* This class will take in a list of restaurants and all tweets related to them and
+* output the best 10 restaurants based on popularity and sentiments of these tweets
+*/
+public class NlpProcessing {
     Map<String, List<String>> restaurants;
     Set<String> PositiveTerms;
     Set<String> NegativeTerms;
+    // count of positive and negative terms in our dictionary, useful for
+    // frequency calculations
     int positiveCount;
     int negativeCount;
+    // Paths to negative positive and negative term documents
     private final String POSITIVE_TERMS = new File("").getAbsolutePath() + "/src/positive.txt";
     private final String NEGATIVE_TERMS = new File("").getAbsolutePath() + "/src/negative.txt";
-    Map<String, Integer> scores;
+    Map<String, Double> scores;
 
-
+    // Constructor initializes all data structures
     public NlpProcessing (Map<String, List<String>> restautants) {
         this.restaurants = restautants;
         this.PositiveTerms = new HashSet<>();
@@ -25,12 +32,15 @@ public class NlpProcessing {
         evaluateTweets();
     }
 
-    public Map<String, Integer> getTopRestaurants() {
-        return this.scores;
-    }
-
+    /*
+    * Gets the highest ten restaurants based on positive sentiments and popularity
+    * measured by how many tweets are there about the restaurant
+    * Sentiment scores and tweet cound are rescaled from 0.0 to 1.0 and added together
+    * to get a score from 0.0 to 2.0 which si used for comparision
+    */
     public String[] getTopTen() {
-        int maxTweets = 0, minScore = Integer.MAX_VALUE, maxScore = 0;
+        int maxTweets = 0;
+        double maxScore = 0, minScore = Integer.MAX_VALUE;
         Map<String, Double> finalScores = new HashMap<>();
         for (String restaurant: scores.keySet()) {
             if (scores.get(restaurant) > maxScore) {
@@ -74,23 +84,26 @@ public class NlpProcessing {
         }
     }
 
+    // Main method in the class, for each restaurant, it takes all its tweets,
+    // and evaluates each tweet's sentiment and gets the average and places
+    // it in the scores map
     public void evaluateTweets() {
         for (String restaurant: restaurants.keySet() ) {
             List<String> tweets = restaurants.get(restaurant);
-            int sum = 0;
+            double sum = 0;
             for (String tweet: tweets) {
-                int score = evaluate(tweet);
+                double score = evaluate(tweet);
                 sum+=score;
             }
-            int avg = sum/tweets.size();
+            double avg = (double) sum/tweets.size();
             scores.put(restaurant, avg);
         }
     }
 
+    // load the positive terms
+    // scan each word and add it to the set of
+    // positive terms
     public void loadFiles () {
-        // load the positive terms
-        // scan each word and add it to the set of
-        // positive terms
         Scanner in = null;
         try {
             in = new Scanner(new File(POSITIVE_TERMS));
@@ -125,7 +138,9 @@ public class NlpProcessing {
 
     }
 
-    public int evaluate (String tweet) {
+    // evaluate a tweet by comparing the frequency of negative and positive terms
+    // in the tweet
+    public double evaluate (String tweet) {
         Set<String> terms = parsetext(tweet);
         int termsCount = terms.size();
         int termPosCount = 0;
@@ -139,9 +154,10 @@ public class NlpProcessing {
             }
         }
         int sum = termPosCount-termNegCount;
-        return sum;
+        return (double) sum/terms.size();
     }
 
+    // takes a text and parses and stemms it to get the terms
     public Set<String> parsetext(String text) {
         Set<String> terms = new HashSet<>();
         String[] words = text.split(" ");
@@ -154,6 +170,7 @@ public class NlpProcessing {
         return terms;
     }
 
+    // parses a word and produces a term if the word is not a stop word, otherwise returns null
     public String processWord (String word) {
             Stemmer stemmer = new Stemmer();
             for (int i=0; i<word.length(); i++) {

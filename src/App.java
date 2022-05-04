@@ -21,7 +21,6 @@ public class App {
         test.put("rest2", r2);
         test.put("rest3", r3);
         NlpProcessing nlp = new NlpProcessing(test);
-        Map<String, Integer> map = nlp.getTopRestaurants();
         String[] s = nlp.getTopTen();
         System.out.println(s[0]);
         
