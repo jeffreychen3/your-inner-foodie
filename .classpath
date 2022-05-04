@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-11">
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.launching.macosx.MacOSXType/Java SE 11.0.1 [11.0.1]">
 		<attributes>
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="libs/opennlp-tools-1.5.3.jar"/>
+	<classpathentry kind="lib" path="libs/porter-stemmer-1.4.jar"/>
+	<classpathentry kind="lib" path="libs/twitter4j-core-4.0.7.jar"/>
+	<classpathentry kind="lib" path="libs/gson-2.9.0.jar"/>
+	<classpathentry kind="lib" path="libs/slf4j-nop-1.7.25.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
