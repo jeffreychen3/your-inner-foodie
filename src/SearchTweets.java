@@ -1,88 +1,105 @@
+import com.twitter.clientlib.TwitterCredentialsBearer;
+import com.twitter.clientlib.auth.TwitterOAuth20AppOnlyApi;
 import twitter4j.*;
-import twitter4j.Query;
-import twitter4j.QueryResult;
-
-import java.util.*;
-
 import twitter4j.conf.ConfigurationBuilder;
 
-import java.util.List;
+import java.time.OffsetDateTime;
+import java.util.*;
+
+import com.twitter.clientlib.TwitterCredentialsOAuth2;
+import com.twitter.clientlib.ApiException;
+import com.twitter.clientlib.api.TwitterApi;
+import com.twitter.clientlib.model.*;
+import com.twitter.clientlib.Configuration;
+import com.twitter.clientlib.auth.*;
+import com.twitter.clientlib.model.*;
+import com.twitter.clientlib.TwitterCredentialsOAuth2;
+import com.twitter.clientlib.TwitterCredentialsBearer;
+import com.twitter.clientlib.TwitterCredentialsOAuth1;
+import com.twitter.clientlib.api.TwitterApi;
 
 public class SearchTweets {
 
-    public static void main(String[] args) {
+    /**
+     * Creates a Twitter API instance that is authorised to access data using Ethan's keys
+     * @return An authorized Twitter API instance
+     */
+    private TwitterApi getTwitterAPI() {
+        TwitterCredentialsOAuth1 credentialsOAuth1 = new TwitterCredentialsOAuth1("aFJOAYb6xmGEfEv7kyspsTK8u",
+                "zw8QB4WyEqMZ0Wp5PWtc4xPRyPi1P0hHgV42LHan3eDTgYD2Qs", "1322109139934306304-N5pglGAs4uePDqIlAT9nl4olwwDIXD",
+                "rV6KbPPIjoFHOKPI9Vt9ffb6UxtBbP8CBymnXxo8RZXsd");
+        TwitterCredentialsBearer credentials = new TwitterCredentialsBearer(System.getenv("AAAAAAAAAAAAAAAAAAAAAKPYbwEAAAAAgCJ2LKJg1u7JkZmjGYnBzKrIejo%3DaGdCNwSP2337H7V8LJheIpHNNNrWPpMWXJjQ2SutTVujBGMdBx"));
+        TwitterApi apiInstance = new TwitterApi();
+        apiInstance.setTwitterCredentials(credentials);
+        apiInstance.setTwitterCredentials(credentialsOAuth1);
+        return apiInstance;
     }
 
     /**
-     *      Searches for tweets in the area we are considering in terms of longitude and latitude, and contains at least
-     *      one of the restaurant names
-     *
-     *      Query length is limited to 512 CHARACTERS
-     * */
-    private Twitter getTwitterInstance() {
-        ConfigurationBuilder cb = new ConfigurationBuilder();
-        cb.setDebugEnabled(true)
-                .setOAuthConsumerKey("aFJOAYb6xmGEfEv7kyspsTK8u")
-                .setOAuthConsumerSecret("zw8QB4WyEqMZ0Wp5PWtc4xPRyPi1P0hHgV42LHan3eDTgYD2Qs")
-                .setOAuthAccessToken("1322109139934306304-HdtnexWKKmQtJogYHgalVp2afbrVum")
-                .setOAuthAccessTokenSecret("qMml5G2n3T9wbn7dCddpdDIUDZuloxquFNuzaNg2CEFd7");
-        Twitter twitter = new TwitterFactory(cb.build()).getInstance();
-
-        return twitter;
-    }
-
-    public ArrayList<String> GetSearchedTweets(Double[][] geolocation, String[] restaurantNames) {
+     * Searches for tweets that contains a restaurant's name and the name of the city, or the author is from the city
+     * @param cityName Name of city
+     * @param restaurantNames An array of all restaurants we want to look for
+     * @return arraylist of all valid tweets (described as above)
+     */
+    public ArrayList<String> GetSearchedTweets(String cityName, String[] restaurantNames) {
         ArrayList<String> tweetedContent = new ArrayList<>();
 
-        Twitter twitter = getTwitterInstance();
-        String queryStr = "";
+        TwitterApi twitter = getTwitterAPI();
 
-        // bounding_box:[west_long south_lat east_long north_lat]
-        // TODO: check if the input is being given s.t. the first element is the "bottom corner" of the bounding box
-        queryStr += "bounding_box:[" + geolocation[0][0] + " " + geolocation[0][1] + " " + geolocation[1][0] + " " +
-                geolocation[1][1]+ "]";
+        Integer maxResults = 20; // Integer | The maximum number of search results to be returned by a request.
+        Set<String> userFields = new HashSet<>(); // Set<String> | A comma separated list of User fields to display.
+        Set<String> placeFields = new HashSet<>(); // Set<String> | A comma separated list of Place fields to display.
+        Set<String> expansions = new HashSet<>();
 
-        // Since query wants tweets from the bounding box AND contain the name of any of the restaurants, adding a
-        //      bracket before we list the restaurant names
-        queryStr += " (";
+        expansions.add("author_id");
 
-        int idx = 0;
+        for (String restaurant : restaurantNames) {
+            System.out.println("HIHIHIHI");
+            String query = "(\"" + restaurant + "\" OR " + "#" + restaurant.replace(" ", "") + ")"; //+ " (\"" + cityName + "\" OR " + "#" + cityName.replace(" ", "") + ")" ;
+            try {
+                TweetSearchResponse result = twitter.tweets().tweetsRecentSearch(query, null, null, null, null, maxResults, null, null, null, expansions, null, null, null, placeFields, null);
+                expansions.add("geo.place_id");
 
-        do {
-            queryStr += " \"" + restaurantNames[idx] + "\"" + " OR";
-            // Removing "OR" placed after the last restaurant in the query
-            if (idx == restaurantNames.length - 1) {
-                queryStr.substring(0, queryStr.length() - 3);
-            }
-            idx++;
-        }
-        // Twitter has a query length limit of 512 characters
-        while (queryStr.length() + restaurantNames[idx].length() < 510 && idx < restaurantNames.length - 1);
+                placeFields.add("geo");
+                placeFields.add("full_name");
+                placeFields.add("name");
 
-        queryStr += ")";
+                userFields.add("location");
 
-        try {
-            Query query = new Query(queryStr);
-            QueryResult result;
+                if (result.getData() == null)
+                    continue;
 
-            do {
-                result = twitter.search(query);
-                List<Status> tweets = result.getTweets();
+                for (Tweet tweet : result.getData()) {
+                    SingleUserLookupResponse user = twitter.users().findUserById(tweet.getAuthorId(), null, null, userFields);
+                    String location = user.getData().getLocation();
 
-                for (Status tweet : tweets) {
-                    tweetedContent.add(tweet.getText());
+                    System.out.println("text: " + tweet.getText().replace("\n", ""));
+
+                    if ((location != null && location.contains(cityName)) || tweet.getText().contains(cityName) ||
+                            tweet.getText().contains(cityName.replace(" ", ""))) {
+                        System.out.println("INSERTED");
+                        tweetedContent.add(tweet.getText());
+                    }
                 }
-            } while ((query = result.nextQuery()) != null);
-
-            return tweetedContent;
-        } catch (TwitterException te) {
-            te.printStackTrace();
-            System.out.println("Failed to search tweets: "
-                    + te.getMessage());
+            } catch (ApiException e) {
+                System.err.println("Exception when calling TweetsApi#tweetsRecentSearch");
+                System.err.println("Status code: " + e.getCode());
+                System.err.println("Reason: " + e.getResponseBody());
+                System.err.println("Response headers: " + e.getResponseHeaders());
+                e.printStackTrace();
+            }
         }
-        return null;
+
+        System.out.println("num of registered tweets: " + tweetedContent.size());
+        return tweetedContent;
     }
 
+    /**
+     * Associates the tweets given to a particular restaurant
+     * @param tweetedContent the text of the tweet
+     * @param restaurantNames the array of restaurant names
+     * @return a map of restaurants (key) to their respective tweets (value)
+     */
     public Map<String, ArrayList<String>> popularTweets(ArrayList<String> tweetedContent, String[] restaurantNames) {
         Map<String, ArrayList<String>> popularTweets = new HashMap<>();
 

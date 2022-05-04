@@ -7,16 +7,17 @@
 */
 public class PrimAlgorithmAdjacencyMatrix {
 
+
 static class Graph{
  int vertices;
- int matrix[][];
+ Double matrix[][];
 
  public Graph(int vertex) {
 	this.vertices = vertex;
-	matrix = new int[vertex][vertex];
+	matrix = new Double[vertex][vertex];
  }
 
- public void addEdge(int source, int destination, int weight) {
+ public void addEdge(int source, int destination, double weight) {
 	//add edge
 	matrix[source][destination] = weight;
 
@@ -24,10 +25,14 @@ static class Graph{
 	matrix[destination][source] = weight;
  }
 
+ public void addMatrix (Double[][] matrix) {
+	 this.matrix = matrix;
+ }
+
  //get the vertex with minimum key which is not included in MST
- int getMinimumVertex(boolean [] mst, int [] key){
-	int minKey = Integer.MAX_VALUE;
-	int vertex = –1;
+ int getMinimumVertex(boolean [] mst, Double [] key){
+	Double minKey = Double.MAX_VALUE;
+	int vertex = -1;
 	for (int i = 0; i <vertices ; i++) {
 		if(mst[i]==false && minKey>key[i]){
 			minKey = key[i];
@@ -41,25 +46,26 @@ static class Graph{
 	// will store the vertex(parent) from which the current vertex will reached
 	int parent;
 	// will store the weight for printing the MST weight
-	int weight;
+	Double weight;
 	}
 
 public void primMST(){
 	boolean[] mst = new boolean[vertices];
 	ResultSet[] resultSet = new ResultSet[vertices];
-	int [] key = new int[vertices];
+	Double[] key = new Double[vertices];
 
 	//Initialize all the keys to infinity and
 	//initialize resultSet for all the vertices
 	for (int i = 0; i <vertices ; i++) {
-		key[i] = Integer.MAX_VALUE;
+		key[i] = Double.MAX_VALUE;
 		resultSet[i] = new ResultSet();
 	}
 
 	//start from the vertex 0
-	key[0] = 0;
+	key[0] = 0.0;
+	mst[0] = true;
 	resultSet[0] = new ResultSet();
-	resultSet[0].parent = –1;
+	resultSet[0].parent = -1;
 
 	//create MST
 	for (int i = 0; i <vertices ; i++) {
@@ -111,7 +117,7 @@ public void primMST(){
  for(int i= 0; i<= 10; i++) {
 	 for (int j = 0; j<=10; j++) {
 		 if (i != j || i > j) { //addEdge already puts in value for [j][i] based on [i][j]
-			graph.addEdge(i, j, adjMatrix[i][j]);
+			//graph.addEdge(i, j, adjMatrix[i][j]);
 		 }
 	}
  }

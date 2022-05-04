@@ -38,7 +38,7 @@ public class NlpProcessing {
     * Sentiment scores and tweet cound are rescaled from 0.0 to 1.0 and added together
     * to get a score from 0.0 to 2.0 which si used for comparision
     */
-    public String[] getTopTen() {
+    public ArrayList<String> getTopTen() {
         int maxTweets = 0;
         double maxScore = 0, minScore = Integer.MAX_VALUE;
         Map<String, Double> finalScores = new HashMap<>();
@@ -67,21 +67,12 @@ public class NlpProcessing {
             pq.add(restaurant);
         }
 
-        if (pq.size() >= 10) {
-            String[] res = new String[10];
-            for (int i=0; i<10; i++) {
-                res[i] = pq.poll();
-            }
-            return res;
-        } else {
-            String[] res = new String[pq.size()];
-            int count = 0;
-            while (!pq.isEmpty()) {
-                res[count] = pq.poll();
-                count++;
-            }
-            return res;
+        ArrayList<String> res = new ArrayList<>();
+        int count = 0;
+        while (count < 10 && !pq.isEmpty()) {
+            res.add(pq.poll());
         }
+        return res;
     }
 
     // Main method in the class, for each restaurant, it takes all its tweets,
