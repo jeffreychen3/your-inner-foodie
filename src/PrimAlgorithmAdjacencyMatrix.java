@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 /* Input: A[i][j] represent distance from restaurant i to restaurant j
 *	and A[i][j] = A[j][i]
 *	and A[i][i] = null since it doesn’t make sense to go from restaurant i to restaurant i
@@ -11,9 +13,12 @@ public class PrimAlgorithmAdjacencyMatrix {
 static class Graph{
  int vertices;
  Double matrix[][];
+	ArrayList<String> restaurants;
 
- public Graph(int vertex) {
-	this.vertices = vertex;
+
+ public Graph(int vertex, ArrayList<String> restaurantNames) {
+	 this.restaurants = restaurantNames;
+			 this.vertices = vertex;
 	matrix = new Double[vertex][vertex];
  }
 
@@ -63,12 +68,12 @@ public void primMST(){
 
 	//start from the vertex 0
 	key[0] = 0.0;
-	mst[0] = true;
 	resultSet[0] = new ResultSet();
 	resultSet[0].parent = -1;
 
 	//create MST
 	for (int i = 0; i <vertices ; i++) {
+
 
 	//get the vertex with the minimum key
 	int vertex = getMinimumVertex(mst, key);
@@ -78,6 +83,9 @@ public void primMST(){
 
 	//iterate through all the adjacent vertices of above vertex and update the keys
 	for (int j = 0; j <vertices ; j++) {
+		if (j==vertex) {
+			continue;
+		}
 	//check of the edge
 	if(matrix[vertex][j]>0){
 	//check if this vertex 'j' already in mst and
@@ -97,30 +105,15 @@ public void primMST(){
 	}
 
  public void printMST(ResultSet[] resultSet){
- int total_min_weight = 0;
- System.out.println("Minimum Spanning Tree: ");
- for (int i = 1; i <vertices ; i++) { 
- 
- //edit this to ouput the name rather than edge 1,2,3,4,xx....
- 
- System.out.println("Edge: " + i + " – " + resultSet[i].parent +
- " key: " + resultSet[i].weight);
+ Double total_min_weight = 0.0;
+ System.out.println("Fastest way to visit top restaurant: ");
+ for (int i = 1; i <vertices ; i++) {
+	 System.out.print(restaurants.get(i) + "- (" + resultSet[i].weight + ") - ");
  total_min_weight += resultSet[i].weight;
  }
- System.out.println("Total minimum distance/key: " + total_min_weight);
+	 System.out.println(restaurants.get(resultSet[vertices - 1].parent));
+	 System.out.printf("Total distance to visit all top restaurants is : %.3f\n", total_min_weight);
  }
  }
 
- public static void main(String[] args) {
- int vertices = 10;
- Graph graph = new Graph(vertices);
- for(int i= 0; i<= 10; i++) {
-	 for (int j = 0; j<=10; j++) {
-		 if (i != j || i > j) { //addEdge already puts in value for [j][i] based on [i][j]
-			//graph.addEdge(i, j, adjMatrix[i][j]);
-		 }
-	}
- }
- graph.primMST();
- }
 }

@@ -57,8 +57,6 @@ public class NlpProcessing {
         for (String restaurant: scores.keySet()) {
             double sentimentScore = (double) (scores.get(restaurant) - minScore) / (double) (maxScore - minScore);
             double popularityScore = (double) restaurants.get(restaurant).size() / (double) maxTweets;
-            System.out.println(restaurant);
-            System.out.println(sentimentScore+popularityScore);
             finalScores.put(restaurant, sentimentScore+popularityScore);
         }
 

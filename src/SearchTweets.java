@@ -52,9 +52,8 @@ public class SearchTweets {
         Set<String> expansions = new HashSet<>();
 
         expansions.add("author_id");
-
+        int counter = 0;
         for (String restaurant : restaurantNames) {
-            System.out.println("HIHIHIHI");
             String query = "(\"" + restaurant + "\" OR " + "#" + restaurant.replace(" ", "") + ")"; //+ " (\"" + cityName + "\" OR " + "#" + cityName.replace(" ", "") + ")" ;
             try {
                 TweetSearchResponse result = twitter.tweets().tweetsRecentSearch(query, null, null, null, null, maxResults, null, null, null, expansions, null, null, null, placeFields, null);
@@ -70,14 +69,14 @@ public class SearchTweets {
                     continue;
 
                 for (Tweet tweet : result.getData()) {
+                    counter++;
+                    if (counter > 449) {
+                        continue;
+                    }
                     SingleUserLookupResponse user = twitter.users().findUserById(tweet.getAuthorId(), null, null, userFields);
                     String location = user.getData().getLocation();
-
-                    System.out.println("text: " + tweet.getText().replace("\n", ""));
-
                     if ((location != null && location.contains(cityName)) || tweet.getText().contains(cityName) ||
                             tweet.getText().contains(cityName.replace(" ", ""))) {
-                        System.out.println("INSERTED");
                         tweetedContent.add(tweet.getText());
                     }
                 }
@@ -90,7 +89,6 @@ public class SearchTweets {
             }
         }
 
-        System.out.println("num of registered tweets: " + tweetedContent.size());
         return tweetedContent;
     }
 
