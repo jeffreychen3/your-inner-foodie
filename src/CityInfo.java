@@ -201,12 +201,17 @@ public class CityInfo {
 				URLGetter url = new URLGetter(DISTANCE_REQ_BASE + "destinations=" + destRestaurantLoc + "&origins=" + origRestaurantLoc +  "&key=" + API_KEY);
 				ArrayList<String> res = url.getContents();
 				JsonObject resObj = convertToJsonObject(res);
-						
-				JsonObject distObj = resObj.get("rows").getAsJsonArray().get(0).getAsJsonObject().get("elements").getAsJsonArray().get(0).getAsJsonObject().get("distance").getAsJsonObject();
-				Double dist = Double.parseDouble(distObj.get("text").getAsString().split(" ")[0]);
-				
-				adjMatrix[i][j] = dist;
-				adjMatrix[j][i] = dist;
+				if (resObj.get("rows").getAsJsonArray().size() == 0) {
+					adjMatrix[i][j] = Double.MAX_VALUE - 10;
+					adjMatrix[j][i] = Double.MAX_VALUE - 10;
+				} else {
+
+					JsonObject distObj = resObj.get("rows").getAsJsonArray().get(0).getAsJsonObject().get("elements").getAsJsonArray().get(0).getAsJsonObject().get("distance").getAsJsonObject();
+					Double dist = Double.parseDouble(distObj.get("text").getAsString().split(" ")[0]);
+
+					adjMatrix[i][j] = dist;
+					adjMatrix[j][i] = dist;
+				}
 				
 			}
 		}
